@@ -1,0 +1,228 @@
+-- Midnight Hub V2
+local ScreenGui = Instance.new("ScreenGui")
+local Main = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local Title = Instance.new("TextLabel")
+local UICorner_2 = Instance.new("UICorner")
+local TabHolder = Instance.new("Frame")
+local UICorner_3 = Instance.new("UICorner")
+local TabButtons = Instance.new("Frame")
+local UICorner_4 = Instance.new("UICorner")
+local UIListLayout = Instance.new("UIListLayout")
+local TabContainer = Instance.new("Frame")
+local UICorner_5 = Instance.new("UICorner")
+local CloseButton = Instance.new("TextButton")
+local UICorner_6 = Instance.new("UICorner")
+local OpenButton = Instance.new("TextButton")
+local UICorner_7 = Instance.new("UICorner")
+
+-- Properties
+ScreenGui.Name = "MidnightHub"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Main.Name = "Main"
+Main.Parent = ScreenGui
+Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Main.Position = UDim2.new(0.3, 0, 0.3, 0)
+Main.Size = UDim2.new(0, 500, 0, 300)
+Main.Visible = false
+Main.Active = true
+Main.Draggable = true
+
+UICorner.Parent = Main
+
+Title.Name = "Title"
+Title.Parent = Main
+Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "Midnight Hub V2 - Muscle Legends"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16.000
+
+UICorner_2.Parent = Title
+
+TabHolder.Name = "TabHolder"
+TabHolder.Parent = Main
+TabHolder.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+TabHolder.Position = UDim2.new(0, 5, 0, 35)
+TabHolder.Size = UDim2.new(1, -10, 1, -40)
+
+UICorner_3.Parent = TabHolder
+
+TabButtons.Name = "TabButtons"
+TabButtons.Parent = TabHolder
+TabButtons.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TabButtons.Position = UDim2.new(0, 5, 0, 5)
+TabButtons.Size = UDim2.new(0, 100, 1, -10)
+
+UICorner_4.Parent = TabButtons
+
+UIListLayout.Parent = TabButtons
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 5)
+
+TabContainer.Name = "TabContainer"
+TabContainer.Parent = TabHolder
+TabContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TabContainer.Position = UDim2.new(0, 110, 0, 5)
+TabContainer.Size = UDim2.new(1, -115, 1, -10)
+
+UICorner_5.Parent = TabContainer
+
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = Main
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseButton.Position = UDim2.new(1, -25, 0, 5)
+CloseButton.Size = UDim2.new(0, 20, 0, 20)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 14.000
+
+UICorner_6.Parent = CloseButton
+
+OpenButton.Name = "OpenButton"
+OpenButton.Parent = ScreenGui
+OpenButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+OpenButton.Position = UDim2.new(0, 5, 0.5, -15)
+OpenButton.Size = UDim2.new(0, 100, 0, 30)
+OpenButton.Font = Enum.Font.GothamBold
+OpenButton.Text = "OPEN GUI"
+OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+OpenButton.TextSize = 14.000
+OpenButton.Visible = true
+
+UICorner_7.Parent = OpenButton
+
+-- Functions
+local function CreateTab(name)
+    local TabButton = Instance.new("TextButton")
+    local TabContent = Instance.new("ScrollingFrame")
+    local UIListLayout = Instance.new("UIListLayout")
+    
+    TabButton.Name = name .. "Button"
+    TabButton.Parent = TabButtons
+    TabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    TabButton.Size = UDim2.new(1, 0, 0, 30)
+    TabButton.Font = Enum.Font.GothamBold
+    TabButton.Text = name
+    TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TabButton.TextSize = 14.000
+    
+    local UICorner = Instance.new("UICorner")
+    UICorner.Parent = TabButton
+    
+    TabContent.Name = name .. "Content"
+    TabContent.Parent = TabContainer
+    TabContent.BackgroundTransparency = 1
+    TabContent.Size = UDim2.new(1, 0, 1, 0)
+    TabContent.ScrollBarThickness = 4
+    TabContent.Visible = false
+    
+    UIListLayout.Parent = TabContent
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    UIListLayout.Padding = UDim.new(0, 5)
+    
+    TabButton.MouseButton1Click:Connect(function()
+        for _, content in pairs(TabContainer:GetChildren()) do
+            content.Visible = false
+        end
+        TabContent.Visible = true
+    end)
+    
+    return TabContent
+end
+
+-- GUI Toggle Functions
+CloseButton.MouseButton1Click:Connect(function()
+    Main.Visible = false
+    OpenButton.Visible = true
+end)
+
+OpenButton.MouseButton1Click:Connect(function()
+    Main.Visible = true
+    OpenButton.Visible = false
+end)
+
+-- Create Tabs
+local MainTab = CreateTab("Main")
+local TeleportsTab = CreateTab("Teleports")
+local CrystalsTab = CreateTab("Crystals")
+local MiscTab = CreateTab("Misc")
+
+-- Functions to add elements to tabs
+local function AddButton(parent, text, callback)
+    local Button = Instance.new("TextButton")
+    Button.Name = text .. "Button"
+    Button.Parent = parent
+    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Button.Size = UDim2.new(1, -10, 0, 30)
+    Button.Position = UDim2.new(0, 5, 0, 0)
+    Button.Font = Enum.Font.GothamBold
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = 14.000
+    
+    local UICorner = Instance.new("UICorner")
+    UICorner.Parent = Button
+    
+    Button.MouseButton1Click:Connect(callback)
+    return Button
+end
+
+-- Add Main Features
+local autoStrength = false
+AddButton(MainTab, "Auto Strength", function()
+    autoStrength = not autoStrength
+    if autoStrength then
+        spawn(function()
+            while autoStrength do
+                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+                wait()
+            end
+        end)
+    end
+end)
+
+-- Add Teleport Locations
+local locations = {
+    ["Legends Gym"] = CFrame.new(4298.60059, 1121.89404, -3898.68066),
+    ["Mythical Gym"] = CFrame.new(2386.89038, 139.607956, 1094.26367),
+    ["Frost Gym"] = CFrame.new(-2752.56543, 125.822533, -386.73703)
+}
+
+for name, cf in pairs(locations) do
+    AddButton(TeleportsTab, name, function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf
+    end)
+end
+
+-- Add Crystal Opening
+local crystals = {"Blue Crystal", "Green Crystal", "Mythical Crystal"}
+for _, crystal in ipairs(crystals) do
+    AddButton(CrystalsTab, "Open " .. crystal, function()
+        game:GetService("ReplicatedStorage").rEvents.openCrystalRemote:InvokeServer("openCrystal", crystal)
+    end)
+end
+
+-- Add Misc Features
+AddButton(MiscTab, "Reset Character", function()
+    game.Players.LocalPlayer.Character:BreakJoints()
+end)
+
+-- Make first tab visible by default
+for _, content in pairs(TabContainer:GetChildren()) do
+    if content:IsA("ScrollingFrame") then
+        content.Visible = true
+        break
+    end
+end
+
+-- Anti AFK
+local VirtualUser = game:GetService('VirtualUser')
+game:GetService('Players').LocalPlayer.Idled:connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
