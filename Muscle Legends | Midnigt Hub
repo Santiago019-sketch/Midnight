@@ -1,30 +1,30 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
-local Window = OrionLib:MakeWindow({Name = "Midnight Hub V3 | Muscle Legends", HidePremium = false, SaveConfig = true, ConfigFolder = "MidnightHub"})
+-- Midnight Hub GUI
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Chaosscripter/Riotscripter/refs/heads/main/Kavo%20Library%202"))()
+local Window = Library.CreateLib("Midnight Hub - Muscle Legends", "Midnight")
+
+-- Main
+local Main = Window:NewTab("Main")
+local MainSection = Main:NewSection("Auto Farm")
 
 -- Variables
 _G.autoStrength = false
 _G.autoRebirth = false
 _G.autoChest = false
 _G.autoBrawl = false
+_G.autoSpeed = false
 
--- Main Tab
-local MainTab = Window:MakeTab({
-    Name = "Main",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
--- Auto Strength
-MainTab:AddToggle({
-    Name = "Auto Strength",
-    Default = false,
-    Callback = function(Value)
-        _G.autoStrength = Value
+-- Functions
+function doStrength()
+    spawn(function()
         while _G.autoStrength do
-            game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+            local args = {
+                [1] = "rep"
+            }
+            game:GetService("Players").LocalPlayer.muscleEvent:FireServer(unpack(args))
             
             -- Auto-equip training tools
-            for _, tool in pairs({"Handstands", "Situps", "Pushups", "Weight"}) do
+            local tools = {"Handstands", "Situps", "Pushups", "Weight"}
+            for _, tool in ipairs(tools) do
                 for _, item in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
                     if item:IsA("Tool") and item.Name == tool then
                         item.Parent = game.Players.LocalPlayer.Character
@@ -33,56 +33,103 @@ MainTab:AddToggle({
             end
             wait()
         end
-    end
-})
+    end)
+end
 
--- Auto Rebirth
-MainTab:AddToggle({
-    Name = "Auto Rebirth",
-    Default = false,
-    Callback = function(Value)
-        _G.autoRebirth = Value
+function doRebirth()
+    spawn(function()
         while _G.autoRebirth do
-            game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+            local args = {
+                [1] = "rebirthRequest"
+            }
+            game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer(unpack(args))
             wait(0.1)
         end
-    end
-})
+    end)
+end
 
--- Auto Chest
-MainTab:AddToggle({
-    Name = "Auto Chest",
-    Default = false,
-    Callback = function(Value)
-        _G.autoChest = Value
+function doChests()
+    spawn(function()
         while _G.autoChest do
-            for _, chest in pairs({"Magma Chest", "Mythical Chest", "Golden Chest", "Enchanted Chest", "Legends Chest"}) do
-                game:GetService("ReplicatedStorage").rEvents.checkChestRemote:InvokeServer(chest)
+            local chests = {
+                "Magma Chest",
+                "Mythical Chest",
+                "Golden Chest",
+                "Enchanted Chest",
+                "Legends Chest"
+            }
+            
+            for _, chest in ipairs(chests) do
+                local args = {
+                    [1] = chest
+                }
+                game:GetService("ReplicatedStorage").rEvents.checkChestRemote:InvokeServer(unpack(args))
             end
             wait(0.1)
         end
-    end
-})
+    end)
+end
 
--- Auto Brawl
-MainTab:AddToggle({
-    Name = "Auto Join Brawl",
-    Default = false,
-    Callback = function(Value)
-        _G.autoBrawl = Value
+function doBrawl()
+    spawn(function()
         while _G.autoBrawl do
-            game:GetService("ReplicatedStorage").rEvents.brawlEvent:FireServer("joinBrawl")
+            local args = {
+                [1] = "joinBrawl"
+            }
+            game:GetService("ReplicatedStorage").rEvents.brawlEvent:FireServer(unpack(args))
             wait(2)
         end
-    end
-})
+    end)
+end
 
--- Teleports Tab
-local TeleportTab = Window:MakeTab({
-    Name = "Teleports",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- Toggles
+MainSection:NewToggle("Auto Strength", "Automatically trains strength", function(state)
+    _G.autoStrength = state
+    doStrength()
+end)
+
+MainSection:NewToggle("Auto Rebirth", "Automatically performs rebirths", function(state)
+    _G.autoRebirth = state
+    doRebirth()
+end)
+
+MainSection:NewToggle("Auto Chest", "Automatically collects all chests", function(state)
+    _G.autoChest = state
+    doChests()
+end)
+
+MainSection:NewToggle("Auto Join Brawl", "Automatically joins brawls", function(state)
+    _G.autoBrawl = state
+    doBrawl()
+end)
+
+-- Crystals
+local Crystals = Window:NewTab("Crystals")
+local CrystalSection = Crystals:NewSection("Open Crystals")
+
+local crystalTypes = {
+    "Blue Crystal",
+    "Green Crystal",
+    "Mythical Crystal",
+    "Frost Crystal",
+    "Inferno Crystal",
+    "Legends Crystal",
+    "Muscle Elite Crystal"
+}
+
+for _, crystal in ipairs(crystalTypes) do
+    CrystalSection:NewButton("Open " .. crystal, "Opens " .. crystal, function()
+        local args = {
+            [1] = "openCrystal",
+            [2] = crystal
+        }
+        game:GetService("ReplicatedStorage").rEvents.openCrystalRemote:InvokeServer(unpack(args))
+    end)
+end
+
+-- Teleports
+local Teleport = Window:NewTab("Teleports")
+local TeleportSection = Teleport:NewSection("Locations")
 
 local locations = {
     ["Legends Gym"] = CFrame.new(4298.60059, 1121.89404, -3898.68066),
@@ -96,82 +143,47 @@ local locations = {
 }
 
 for locationName, coords in pairs(locations) do
-    TeleportTab:AddButton({
-        Name = locationName,
-        Callback = function()
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = coords
-        end
-    })
+    TeleportSection:NewButton(locationName, "Teleport to " .. locationName, function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = coords
+    end)
 end
 
--- Crystals Tab
-local CrystalsTab = Window:MakeTab({
-    Name = "Crystals",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- Player
+local Player = Window:NewTab("Player")
+local PlayerSection = Player:NewSection("Player Mods")
 
-local crystals = {
-    "Blue Crystal",
-    "Green Crystal",
-    "Mythical Crystal",
-    "Frost Crystal",
-    "Inferno Crystal",
-    "Legends Crystal",
-    "Muscle Elite Crystal"
-}
+PlayerSection:NewSlider("WalkSpeed", "Changes your walkspeed", 500, 16, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+end)
 
-for _, crystal in ipairs(crystals) do
-    CrystalsTab:AddButton({
-        Name = "Open " .. crystal,
-        Callback = function()
-            game:GetService("ReplicatedStorage").rEvents.openCrystalRemote:InvokeServer("openCrystal", crystal)
-        end
-    })
-end
+PlayerSection:NewSlider("JumpPower", "Changes your jumppower", 350, 50, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = s
+end)
 
--- Player Tab
-local PlayerTab = Window:MakeTab({
-    Name = "Player",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- Misc
+local Misc = Window:NewTab("Misc")
+local MiscSection = Misc:NewSection("Other Features")
 
-PlayerTab:AddSlider({
-    Name = "WalkSpeed",
-    Min = 16,
-    Max = 500,
-    Default = 16,
-    Color = Color3.fromRGB(255,255,255),
-    Increment = 1,
-    Callback = function(Value)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
-    end    
-})
+MiscSection:NewButton("Reset Character", "Resets your character", function()
+    game.Players.LocalPlayer.Character:BreakJoints()
+end)
 
-PlayerTab:AddSlider({
-    Name = "JumpPower",
-    Min = 50,
-    Max = 350,
-    Default = 50,
-    Color = Color3.fromRGB(255,255,255),
-    Increment = 1,
-    Callback = function(Value)
-        game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
-    end    
-})
-
--- Anti AFK
-game:GetService("Players").LocalPlayer.Idled:connect(function()
-    game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-    wait(1)
-    game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+MiscSection:NewKeybind("Toggle UI", "Toggles the UI visibility", Enum.KeyCode.RightControl, function()
+    Library:ToggleUI()
 end)
 
 -- Credits
-OrionLib:MakeNotification({
-    Name = "Midnight Hub V3",
-    Content = "Successfully loaded! Press RightShift to toggle GUI",
-    Image = "rbxassetid://4483345998",
-    Time = 5
-})
+local Credits = Window:NewTab("Credits")
+local CreditsSection = Credits:NewSection("Midnight Hub")
+
+CreditsSection:NewLabel("Created by Assistant")
+CreditsSection:NewLabel("UI Library: Kavo UI")
+CreditsSection:NewLabel("Version 1.0.0")
+
+-- Anti AFK
+local vu = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:connect(function()
+    vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    wait(1)
+    vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+end)
